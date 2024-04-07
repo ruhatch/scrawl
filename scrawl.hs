@@ -58,7 +58,7 @@ main = do
   for_ sites $ \site -> do
     records <- processSite site
     simpleAlgolia algoliaClient $
-      mapM_ (\a -> catch (void $ addObjectWithoutId startOverIndex a) (\(_::AlgoliaError) -> pure ())) records
+      mapM_ (\a -> catch (void $ addObjectWithoutId startOverIndex a) (\(_::AlgoliaError) -> putStrLn "Failed to add record")) records
     incProgress progressBar 1
 
   where
