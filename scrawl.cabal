@@ -1,0 +1,27 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.34.2.
+--
+-- see: https://github.com/sol/hpack
+
+name:           scrawl
+version:        0.0.0
+build-type:     Simple
+
+executable scrawl
+  main-is: scrawl.hs
+  other-modules:
+      Paths_scrawl
+  build-depends:
+      aeson
+    , algolia
+    , base ==4.*
+    , bytestring
+    , containers
+    , exceptions
+    , mtl
+    , regex-base
+    , regex-posix
+    , scalpel
+    , terminal-progress-bar
+  default-language: Haskell2010

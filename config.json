@@ -1,0 +1,9 @@
+{
+  "index_name": "start-over",
+  "start_urls": ["https://consciousanger.mystrikingly.com"],
+  "selectors": {
+    "lvl0": ".s-title h2 p strong, .s-component h2 p",
+    "lvl1": ".s-component h3 p, .s-component h3 span, .s-item-title h3",
+    "text": ".s-item-text span, .s-item-text p, .s-item-text li p"
+  }
+}

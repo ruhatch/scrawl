@@ -1,0 +1,15 @@
+dependencies:   
+  - base == 4.*   
+  - algolia 
+  - aeson
+  - bytestring
+  - containers
+  - exceptions
+  - mtl
+  - regex-base 
+  - regex-posix 
+  - scalpel 
+  - terminal-progress-bar
+executables:   
+  scrawl:     
+    main: scrawl.hs
