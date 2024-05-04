@@ -6,10 +6,10 @@
 
 import Control.Monad (void, when)
 import Control.Monad.Catch (catch)
+import Control.Monad.Parallel (forM_)
 import Control.Monad.Trans.Class (lift)
 import Data.Aeson (ToJSON)
 import Data.ByteString.Char8 (pack)
-import Data.Foldable (for_)
 import Data.List (intercalate, stripPrefix)
 import Data.Maybe (fromMaybe)
 import qualified Data.Set as Set (fromList, toList)
@@ -56,7 +56,7 @@ main = do
     10
     (Progress 0 (length sites) ())
 
-  for_ sites $ \site -> do
+  forM_ sites $ \site -> do
     records <- processSite site
     simpleAlgolia algoliaClient $
       mapM_ (\a -> catch (void $ addObjectWithoutId startOverIndex a) (\(_::AlgoliaError) -> lift $ putStrLn "Failed to add record")) records

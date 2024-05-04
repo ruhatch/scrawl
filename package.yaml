@@ -5,6 +5,7 @@ dependencies:
   - bytestring
   - containers
   - exceptions
+  - monad-parallel
   - mtl
   - regex-base
   - regex-posix
