@@ -1,0 +1,21 @@
+name: Index PM Sites
+
+on:
+  workflow_dispatch:
+  schedule: 
+  - cron: '5 4 * * 1'
+
+jobs:
+
+  index:
+  
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4.1.4
+    - uses: cachix/install-nix-action@v26
+    - uses: workflow/nix-shell-action@v3.3.0
+      with:
+        flakes-from-devshell: true
+        script: stack run
+      
