@@ -6,6 +6,7 @@
 
 import Control.Monad (void, when)
 import Control.Monad.Catch (catch)
+import Control.Monad.Trans.Class (lift)
 import Data.Aeson (ToJSON)
 import Data.ByteString.Char8 (pack)
 import Data.Foldable (for_)
@@ -40,8 +41,8 @@ startOverIndex = IndexName "start-over"
 
 main :: IO ()
 main = do
-  algoliaClient <- 
-    mkAlgoliaClient 
+  algoliaClient <-
+    mkAlgoliaClient
       <$> (ApiKey . pack <$> getEnv "API_KEY")
       <*> (ApplicationId . pack <$> getEnv "APPLICATION_ID")
 
@@ -58,7 +59,7 @@ main = do
   for_ sites $ \site -> do
     records <- processSite site
     simpleAlgolia algoliaClient $
-      mapM_ (\a -> catch (void $ addObjectWithoutId startOverIndex a) (\(_::AlgoliaError) -> putStrLn "Failed to add record")) records
+      mapM_ (\a -> catch (void $ addObjectWithoutId startOverIndex a) (\(_::AlgoliaError) -> lift $ putStrLn "Failed to add record")) records
     incProgress progressBar 1
 
   where

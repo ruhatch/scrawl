@@ -6,6 +6,7 @@ cabal-version: 1.12
 
 name:           scrawl
 version:        0.0.0
+license-file:   LICENSE
 build-type:     Simple
 
 executable scrawl
@@ -24,4 +25,5 @@ executable scrawl
     , regex-posix
     , scalpel
     , terminal-progress-bar
+    , transformers
   default-language: Haskell2010
