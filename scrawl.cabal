@@ -24,6 +24,7 @@ executable scrawl
     , mtl
     , regex-base
     , regex-posix
+    , safe-exceptions
     , scalpel
     , terminal-progress-bar
     , transformers

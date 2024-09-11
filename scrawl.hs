@@ -4,18 +4,20 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 
+import Control.Exception.Safe (handleAny)
 import Control.Monad (void, when)
 import Control.Monad.Catch (catch)
 import Control.Monad.Parallel (forM_)
 import Control.Monad.Trans.Class (lift)
 import Data.Aeson (ToJSON)
 import Data.ByteString.Char8 (pack)
-import Data.List (intercalate, stripPrefix)
+import Data.List (stripPrefix)
 import Data.Maybe (fromMaybe)
 import qualified Data.Set as Set (fromList, toList)
 import GHC.Generics ( Generic )
 import Network.Algolia.Search hiding (length)
 import System.Environment (getEnv)
+import System.IO (hPutStrLn, stderr)
 import System.ProgressBar
 import Text.HTML.Scalpel
 import Text.Regex.Base.RegexLike (makeRegex)
@@ -95,16 +97,20 @@ main = do
       }
 
 processSite :: URL -> IO [AlgoliaRecord]
-processSite site = fmap (fromMaybe []) . scrapeURL site $ do
+processSite site = handleAny handleException . fmap (fromMaybe []) . scrapeURL site $ do
     title <- attr "content" $ "meta" @: ["property" @= "og:site_name"]
     logo <- attr "src" $ "div" @: [hasClass "s-logo"] // "img"
     chroots ("li" @: [hasClass "slide"]) (slide title logo site)
   where
+    handleException _ = do
+        hPutStrLn stderr $ "Failed to process site " <> site
+        pure []
+
     slide :: String -> URL -> URL -> Scraper String AlgoliaRecord
     slide title logo site = do
       sectionId <- attr "id" $ "li" @: [hasClass "slide"]
       section <- text $ "div" @: [hasClass "s-title"] // "h2"
-      content <- fmap (intercalate " ") . texts $
+      content <- fmap unwords . texts $
         "div" @: [hasClass "s-item-text-group"]
       when (null content) (fail "Empty content")
       pure $ AlgoliaRecord
