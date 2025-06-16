@@ -22,3 +22,5 @@ jobs:
         APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
       with:
         test: false
+        install-stack: false
+        upgrade-stack: false
