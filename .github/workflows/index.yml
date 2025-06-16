@@ -24,3 +24,4 @@ jobs:
         test: false
         install-stack: false
         upgrade-stack: false
+        stack-build-arguments: "--fast"
