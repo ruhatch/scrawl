@@ -12,15 +12,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4.1.4
-    - uses: cachix/install-nix-action@v26
-    - uses: DeterminateSystems/magic-nix-cache-action@v4
-    - uses: freckle/stack-cache-action@v2.0.9
-    - uses: workflow/nix-shell-action@v3.3.0
+    - uses: actions/checkout@v4.2.2
+    - uses: cachix/install-nix-action@v31.4.0
+    - uses: DeterminateSystems/magic-nix-cache-action@v10
+    - uses: nicknovitski/nix-develop@v1.2.1
+    - uses: freckle/stack-action@v5.7.1
       env:
         API_KEY: ${{ secrets.API_KEY }}
         APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
       with:
-        flakes-from-devshell: true
-        script: stack run
-      
+        test: false
