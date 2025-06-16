@@ -17,12 +17,12 @@ jobs:
     - uses: DeterminateSystems/magic-nix-cache-action@v10
     - uses: nicknovitski/nix-develop@v1.2.1
     - uses: freckle/stack-action@v5.7.1
-      env:
-        API_KEY: ${{ secrets.API_KEY }}
-        APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
       with:
         test: false
         install-stack: false
         upgrade-stack: false
         stack-build-arguments: "--fast"
     - run: stack run
+      env:
+        API_KEY: ${{ secrets.API_KEY }}
+        APPLICATION_ID: ${{ secrets.APPLICATION_ID }}
