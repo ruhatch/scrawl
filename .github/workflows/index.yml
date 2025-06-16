@@ -25,3 +25,4 @@ jobs:
         install-stack: false
         upgrade-stack: false
         stack-build-arguments: "--fast"
+    - run: stack run
