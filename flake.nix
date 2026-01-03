@@ -13,6 +13,8 @@
                                            # from stack.yaml snapshot
 
         myDevTools = [
+          pkgs.chromedriver
+          pkgs.chromium
           hPkgs.ghc # GHC compiler in the desired version (will be available on PATH)
           hPkgs.ghcid # Continuous terminal Haskell compile checker
           hPkgs.ormolu # Haskell formatter

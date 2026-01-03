@@ -2,13 +2,13 @@ name: Index PM Sites
 
 on:
   workflow_dispatch:
-  schedule: 
+  schedule:
   - cron: '5 4 * * 1'
 
 jobs:
 
   index:
-  
+
     runs-on: ubuntu-latest
 
     steps:
@@ -22,7 +22,15 @@ jobs:
         install-stack: false
         upgrade-stack: false
         stack-build-arguments: "--fast"
-    - run: stack run
+    - name: Setup Xvfb
+      run: Xvfb :99 -screen 0 1920x1080x24 > /dev/null 2>&1 &
+    - uses: nanasess/setup-chromedriver@v2.3.0
+    - name: Index Sites
+      run: |
+        export DISPLAY=:99
+        /usr/local/bin/chromedriver --url-base=/wd/hub --port=4444 &
+        sleep 5
+        stack run
       env:
         API_KEY: ${{ secrets.API_KEY }}
         APPLICATION_ID: ${{ secrets.APPLICATION_ID }}

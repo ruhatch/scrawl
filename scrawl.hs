@@ -4,10 +4,11 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
 
+import Control.Concurrent (threadDelay)
 import Control.Exception.Safe (handleAny)
-import Control.Monad (void, when)
+import Control.Monad (forM_, void, when)
 import Control.Monad.Catch (catch)
-import Control.Monad.Parallel (forM_)
+import Control.Monad.IO.Class (liftIO)
 import Control.Monad.Trans.Class (lift)
 import Data.Aeson (ToJSON)
 import Data.ByteString.Char8 (pack)
@@ -19,9 +20,12 @@ import Network.Algolia.Search hiding (length)
 import System.Environment (getEnv)
 import System.IO (hPutStrLn, stderr)
 import System.ProgressBar
+import Test.WebDriver (Capabilities(browser), WDConfig(..), chrome, chromeOptions, closeSession,
+  defaultCaps, defaultConfig, getSource, openPage, runSession)
 import Text.HTML.Scalpel
 import Text.Regex.Base.RegexLike (makeRegex)
 import Text.Regex.Posix (Regex)
+import Text.StringLike (StringLike(toString))
 
 data Slide = Slide
   { header :: String
@@ -37,6 +41,24 @@ data AlgoliaRecord = AlgoliaRecord
   } deriving (Generic, Show)
 
 instance ToJSON AlgoliaRecord
+
+chromeConfig :: WDConfig
+chromeConfig = defaultConfig
+    { wdHost = "localhost"
+    , wdPort = 4444
+    , wdCapabilities = defaultCaps {
+        browser = chrome {
+          chromeOptions =
+            [
+              "--no-sandbox",
+              "--disable-dev-shm-usage",
+              "--disable-blink-features=AutomationControlled",
+              "--start-maximized",
+              "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            ]
+        }
+      }
+    }
 
 startOverIndex :: IndexName a
 startOverIndex = IndexName "start-over"
@@ -68,7 +90,7 @@ main = do
     fetchSitesFromSpaceport :: IO [URL]
     fetchSitesFromSpaceport =
       Set.toList . Set.fromList . fmap normalise . fromMaybe [] <$>
-        scrapeURL "https://spaceport.mystrikingly.com" urls
+        scrapeURL' "https://spaceport.mystrikingly.com" 30000000 urls
 
     normalise :: URL -> URL
     normalise = removeHttps . removeTrailingSlash
@@ -83,7 +105,7 @@ main = do
       '/' -> init url
       _   -> url
 
-    urls :: Scraper String [URL]
+    urls :: Scraper URL [URL]
     urls = attrs "href" $ "a" @: ["href" @=~ strikinglyRegex]
 
     strikinglyRegex :: Regex
@@ -96,8 +118,21 @@ main = do
       , stylePostfix = exact
       }
 
+scrapeURL' :: URL -> Int -> Scraper String a -> IO (Maybe a)
+scrapeURL' url timeout scraper =  do
+  htmlSource <- runSession chromeConfig $ do
+    openPage url
+    -- Wait for the WAF challenge to finish
+    liftIO $ threadDelay timeout -- 30 seconds
+    -- Get the rendered HTML source
+    htmlSource <- getSource
+    closeSession
+    pure htmlSource
+
+  pure $ scrapeStringLike (toString htmlSource) scraper
+
 processSite :: URL -> IO [AlgoliaRecord]
-processSite site = handleAny handleException . fmap (fromMaybe []) . scrapeURL site $ do
+processSite site = handleAny handleException . fmap (fromMaybe []) . scrapeURL' site 15000000 $ do
     title <- attr "content" $ "meta" @: ["property" @= "og:site_name"]
     logo <- attr "src" $ "div" @: [hasClass "s-logo"] // "img"
     chroots ("li" @: [hasClass "slide"]) (slide title logo site)

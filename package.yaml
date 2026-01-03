@@ -11,8 +11,10 @@ dependencies:
   - regex-posix
   - safe-exceptions
   - scalpel
+  - tagsoup
   - terminal-progress-bar
   - transformers
+  - webdriver
 executables:
   scrawl:
     main: scrawl.hs

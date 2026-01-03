@@ -26,6 +26,8 @@ executable scrawl
     , regex-posix
     , safe-exceptions
     , scalpel
+    , tagsoup
     , terminal-progress-bar
     , transformers
+    , webdriver
   default-language: Haskell2010
